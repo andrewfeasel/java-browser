@@ -1,11 +1,8 @@
+package com.andrew;
+
  
 
-//import com.andrew.BrowserFrame;
 import javax.swing.SwingUtilities;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.MalformedURLException;
 
 /**
  *
@@ -19,12 +16,9 @@ public class Main {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             BrowserFrame myBrowser = new BrowserFrame();
-            try {
-                BrowserFrame.Tab firstTab = myBrowser.newTab();
-                firstTab.navigateTo(new URI("http://info.cern.ch").toURL());
-            } catch (URISyntaxException | MalformedURLException err) {
-                err.printStackTrace();
-            }
+            
+						Navigator firstTab = myBrowser.newTab();
+            firstTab.setPage("http://info.cern.ch");
         });
     }
     
