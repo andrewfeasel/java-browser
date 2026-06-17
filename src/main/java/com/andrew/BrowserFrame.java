@@ -103,11 +103,10 @@ public class BrowserFrame extends JFrame {
 		BrowserTab tab = new BrowserTab();
 		tab.addPropertyChangeListener("title", (PropertyChangeEvent event) -> {
 			String newTitle = (String)event.getNewValue();
-			System.out.println(newTitle);
 			if (newTitle == null)
 				this.tabbedPane.setTitleAt(this.tabbedPane.indexOfComponent(tab), "Unnamed Tab");
 			else
-				this.tabbedPane.setTitleAt(this.tabbedPane.indexOfComponent(tab), (String)event.getNewValue());
+				this.tabbedPane.setTitleAt(this.tabbedPane.indexOfComponent(tab), newTitle);
 		});
 		tab.addPropertyChangeListener("closed", (PropertyChangeEvent event) -> {
 			this.tabbedPane.remove(tab);

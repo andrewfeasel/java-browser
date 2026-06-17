@@ -15,9 +15,6 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTML;
-import javax.swing.text.ElementIterator;
-import javax.swing.text.StyleConstants;
-import javax.swing.SwingUtilities;
 import java.net.URL;
 
 import javax.swing.text.BadLocationException;
