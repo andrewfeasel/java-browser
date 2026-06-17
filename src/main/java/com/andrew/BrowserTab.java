@@ -6,10 +6,15 @@ package com.andrew;
  */
 
 import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JButton;
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+
+import java.awt.Dimension;
 
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.text.html.HTMLEditorKit;
@@ -23,19 +28,49 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class BrowserTab extends JComponent implements Navigator {
-	private JTextField urlField;
+public class BrowserTab extends JComponent {
 	private JTextPane textPane;
 	private HTMLEditorKit editorKit;
 	private HTMLDocument document;
 	
+	private JButton reloadButton;
+	private JButton searchButton;
+	private JTextField urlField;
 	public BrowserTab() {
 		super();
 		this.setLayout(new BorderLayout());
+	
+		JPanel navigatorBar = new JPanel();
+		navigatorBar.setLayout(new FlowLayout(FlowLayout.LEFT));
+
+		this.reloadButton = new JButton("Reload");
+		this.reloadButton.addActionListener((event) -> {
+			this.setPage(this.textPane.getPage());
+		});
+		navigatorBar.add(this.reloadButton);
+
+		this.searchButton = new JButton("Search");
+		this.searchButton.addActionListener((event) -> {
+			this.setPage(this.urlField.getText());
+		});
+		navigatorBar.add(this.searchButton);
 		
+		// this is where the fun begins
 		this.urlField = new JTextField(24);
-		this.add(this.urlField, BorderLayout.NORTH);	
-		
+
+		// set urlField height to reloadButton height
+		Dimension newUrlFieldDimension = new Dimension(this.urlField.getPreferredSize().width, this.reloadButton.getPreferredSize().height);
+		this.urlField.setPreferredSize(newUrlFieldDimension);
+
+		// fix pixel alignment
+		this.urlField.setLocation(this.urlField.getX(), this.urlField.getY() + 2);
+		this.urlField.repaint();
+
+		// urlField is only slightly ugly now
+		navigatorBar.add(this.urlField);
+
+		this.add(navigatorBar, BorderLayout.NORTH);
+
 		this.textPane = new JTextPane();
 		this.textPane.setEditable(false);
 		
@@ -61,12 +96,10 @@ public class BrowserTab extends JComponent implements Navigator {
 		this.add(scrollPane, BorderLayout.CENTER);
 	}
 	
-	@Override
 	public URL getPage() {
 		return this.textPane.getPage();
 	}
 	
-	@Override
 	public void setPage(URL newPage) {
 		this.urlField.setText(newPage.toString());
 		try {
@@ -77,7 +110,6 @@ public class BrowserTab extends JComponent implements Navigator {
 		}
 	}
 	
-	@Override
 	public void setPage(String newPage) {
 		try {
 			URL newUrl = new URI(newPage).toURL();
@@ -87,18 +119,7 @@ public class BrowserTab extends JComponent implements Navigator {
 			this.textPane.setText(errorText);
 		}
 	}
-	
-	@Override
-	public void setPageText(String pageText) {
-		this.textPane.setText(pageText);
-	}
-	
-	@Override
-	public String getUrlBarText() {
-		return this.urlField.getText();
-	}
-	
-	@Override
+
 	public void close() {
 		this.firePropertyChange("closed", false, true);
 	}

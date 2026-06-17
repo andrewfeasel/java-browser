@@ -53,30 +53,6 @@ public class BrowserFrame extends JFrame {
 		this.toolBar = new JToolBar();
 		var that = this;
 				
-		AbstractAction searchAction = new AbstractAction("Search") {
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				Navigator currentTab = (BrowserTab)that.tabbedPane.getSelectedComponent();
-				try {
-					URL newUrl = new URI(currentTab.getUrlBarText()).toURL();
-					currentTab.setPage(newUrl);
-				} catch (URISyntaxException | MalformedURLException err) {
-					String errorText = String.format("<html><strong>URL Format Error</strong><br/><p>%s</p></html>", err.toString());
-					currentTab.setPageText(errorText);
-				}
-			}
-		};
-		this.toolBar.add(searchAction);
-		
-		AbstractAction reloadAction = new AbstractAction("Reload") {
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				Navigator currentTab = (BrowserTab)that.tabbedPane.getSelectedComponent();
-				currentTab.setPage(currentTab.getPage());
-			}
-		};
-		this.toolBar.add(reloadAction);
-		
 		AbstractAction newTabAction = new AbstractAction("New Tab") {
 			@Override
 			public void actionPerformed(ActionEvent event) {
@@ -88,7 +64,7 @@ public class BrowserFrame extends JFrame {
 		AbstractAction closeTabAction = new AbstractAction("Close Tab") {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				Navigator currentTab = (BrowserTab)that.tabbedPane.getSelectedComponent();
+				BrowserTab currentTab = (BrowserTab)that.tabbedPane.getSelectedComponent();
 				currentTab.close();
 			}
 		};
@@ -99,7 +75,7 @@ public class BrowserFrame extends JFrame {
 		this.setSize(800, 600);
 	}
 	
-	public Navigator newTab() {
+	public BrowserTab newTab() {
 		BrowserTab tab = new BrowserTab();
 		tab.addPropertyChangeListener("title", (PropertyChangeEvent event) -> {
 			String newTitle = (String)event.getNewValue();
