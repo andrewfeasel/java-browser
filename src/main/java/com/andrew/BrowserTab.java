@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.andrew;
 
 /**
@@ -19,7 +15,9 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTML;
-
+import javax.swing.text.ElementIterator;
+import javax.swing.text.StyleConstants;
+import javax.swing.SwingUtilities;
 import java.net.URL;
 
 import javax.swing.text.BadLocationException;
@@ -31,12 +29,6 @@ import java.net.URISyntaxException;
 public class BrowserTab extends JComponent implements Navigator {
 	private JTextField urlField;
 	private JTextPane textPane;
-	
-	private String pageTitle;
-	private Runnable pageChangeListener;
-	
-	private Runnable closeListener;
-	
 	private HTMLEditorKit editorKit;
 	private HTMLDocument document;
 	
@@ -45,7 +37,7 @@ public class BrowserTab extends JComponent implements Navigator {
 		this.setLayout(new BorderLayout());
 		
 		this.urlField = new JTextField(24);
-    this.add(this.urlField, BorderLayout.NORTH);	
+		this.add(this.urlField, BorderLayout.NORTH);	
 		
 		this.textPane = new JTextPane();
 		this.textPane.setEditable(false);
@@ -57,13 +49,19 @@ public class BrowserTab extends JComponent implements Navigator {
 		this.textPane.addHyperlinkListener(event -> {
 			if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
 				this.setPage(event.getURL());
-      }
+			}
 		});
 		
 		this.document = (HTMLDocument)this.textPane.getDocument();
 		
+		this.textPane.addPropertyChangeListener("page", event -> {
+			this.document = (HTMLDocument)this.textPane.getDocument();
+			String pageTitle = (String)this.document.getProperty(HTMLDocument.TitleProperty);
+			this.firePropertyChange("title", null, pageTitle);
+		});
+		
 		JScrollPane scrollPane = new JScrollPane(this.textPane);
-    this.add(scrollPane, BorderLayout.CENTER);
+		this.add(scrollPane, BorderLayout.CENTER);
 	}
 	
 	@Override
@@ -76,16 +74,7 @@ public class BrowserTab extends JComponent implements Navigator {
 		this.urlField.setText(newPage.toString());
 		try {
 			this.textPane.setPage(newPage);
-      try {
-				HTMLDocument.Iterator it = this.document.getIterator(HTML.Tag.TITLE);
-				int titleStart = it.getStartOffset();
-        this.pageTitle = this.document.getText(titleStart, it.getEndOffset() - titleStart);
-        this.pageChangeListener.run();
-      } catch (BadLocationException error) {
-        this.pageTitle = "Unnamed Tab";
-        this.pageChangeListener.run();
-      }
-    } catch (IOException err) {
+		} catch (IOException err) {
 			String errorText = String.format("<html><strong>Connection Error</strong><br/><p>%s</p></html>", err.toString());
 			this.textPane.setText(errorText);
 		}
@@ -103,11 +92,6 @@ public class BrowserTab extends JComponent implements Navigator {
 	}
 	
 	@Override
-	public String getTitle() {
-		return this.pageTitle;
-	}
-	
-	@Override
 	public void setPageText(String pageText) {
 		this.textPane.setText(pageText);
 	}
@@ -118,27 +102,7 @@ public class BrowserTab extends JComponent implements Navigator {
 	}
 	
 	@Override
-	public Runnable getPageChangeListener() {
-		return this.pageChangeListener;
-	}
-	
-	@Override
-	public void setPageChangeListener(Runnable listener) {
-		this.pageChangeListener = listener;
-	}
-	
-	@Override
-	public Runnable getCloseListener() {
-		return this.closeListener;
-	}
-	
-	@Override
-	public void setCloseListener(Runnable listener) {
-		this.closeListener = listener;
-	}
-	
-	@Override
 	public void close() {
-		this.closeListener.run();
+		this.firePropertyChange("closed", false, true);
 	}
 }
