@@ -43,12 +43,10 @@ public class BrowserFrame extends JFrame {
 		
 		this.setTitle("Web Browser");
 		this.setDefaultCloseOperation(super.EXIT_ON_CLOSE);
-
-		JComponent root = this.getRootPane();
-		root.setLayout(new BorderLayout());
+		this.setLayout(new BorderLayout());
 		
 		this.tabbedPane = new JTabbedPane();
-		root.add(this.tabbedPane, BorderLayout.CENTER);
+		this.add(this.tabbedPane, BorderLayout.CENTER);
 		
 		this.toolBar = new JToolBar();
 		var that = this;
@@ -70,9 +68,9 @@ public class BrowserFrame extends JFrame {
 		};
 		this.toolBar.add(closeTabAction);
 		
-		root.add(this.toolBar, BorderLayout.NORTH);
+		this.add(this.toolBar, BorderLayout.NORTH);
 		this.setVisible(true);
-		this.setSize(800, 600);
+		this.setSize(900, 600);
 	}
 	
 	public BrowserTab newTab() {

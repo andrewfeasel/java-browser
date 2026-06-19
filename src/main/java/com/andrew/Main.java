@@ -15,7 +15,7 @@ public class Main {
 		SwingUtilities.invokeLater(() -> {
 			BrowserFrame myBrowser = new BrowserFrame();
 			BrowserTab firstTab = myBrowser.newTab();
-			firstTab.setPage("http://info.cern.ch");
+			firstTab.setUrl("http://info.cern.ch");
 		});
 	}
 }
