@@ -57,6 +57,7 @@ public class BrowserTab extends JComponent {
 
 		this.backButton = new JButton("Back");
 		this.backButton.addActionListener((event) -> {
+			this.urlIterator.previous();
 			this.setPage(this.urlIterator.previous(), false);
 		});
 		navigatorBar.add(this.backButton);
@@ -69,6 +70,7 @@ public class BrowserTab extends JComponent {
 
 		this.nextButton = new JButton("Next");
 		this.nextButton.addActionListener((event) -> {
+			this.urlIterator.next();
 			this.setPage(this.urlIterator.next(), false);
 		});
 		navigatorBar.add(this.nextButton);
