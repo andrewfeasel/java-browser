@@ -20,6 +20,16 @@ import javax.swing.JToolBar;
 
 import java.net.URI;
 import java.net.URL;
+import java.net.URLConnection;
+
+import java.io.InputStream;
+import java.io.BufferedInputStream;
+import java.io.FileOutputStream;
+import java.io.BufferedOutputStream;
+
+import javax.swing.JFileChooser;
+import java.io.File;
+import java.io.IOException;
 
 import java.net.CookieManager;
 import java.net.CookieHandler;
@@ -40,7 +50,7 @@ public class BrowserFrame extends JFrame {
 	
 	public BrowserFrame() {
 		super();
-		
+
 		this.setTitle("Web Browser");
 		this.setDefaultCloseOperation(super.EXIT_ON_CLOSE);
 		this.setLayout(new BorderLayout());
@@ -50,7 +60,48 @@ public class BrowserFrame extends JFrame {
 		
 		this.toolBar = new JToolBar();
 		var that = this;
-				
+		
+		this.toolBar.add(new AbstractAction("Close") {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				System.exit(0);
+			}
+		});
+		this.toolBar.add(new AbstractAction("Download Page") {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				JFileChooser fileChooser = new JFileChooser();
+				fileChooser.setDialogTitle("Save As");
+				fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+				fileChooser.setMultiSelectionEnabled(false);
+
+
+				int fileSelectionStatus = fileChooser.showOpenDialog(that);
+				if (fileSelectionStatus != JFileChooser.APPROVE_OPTION) {
+					return;
+				}
+
+				File fileOutput = fileChooser.getSelectedFile();
+
+				try {
+					URLConnection inputConnection = that.getSelectedTab().getUrl().openConnection();
+					inputConnection.setDoInput(true);
+					inputConnection.setDoOutput(false);
+					
+					try (
+						InputStream remoteInput = inputConnection.getInputStream();
+						BufferedInputStream remoteBufferedInput = new BufferedInputStream(remoteInput);
+						FileOutputStream fileOutputStream = new FileOutputStream(fileOutput);
+						BufferedOutputStream bufferedFileOutputStream = new BufferedOutputStream(fileOutputStream);
+					) {
+						remoteBufferedInput.transferTo(bufferedFileOutputStream);
+					}
+				} catch (IOException err) {
+					err.printStackTrace();
+				}
+			}
+		});
+
 		AbstractAction newTabAction = new AbstractAction("New Tab") {
 			@Override
 			public void actionPerformed(ActionEvent event) {
@@ -87,5 +138,9 @@ public class BrowserFrame extends JFrame {
 		});
 		this.tabbedPane.addTab("Unnamed Tab", tab);
 		return tab;
+	}
+
+	public BrowserTab getSelectedTab() {
+		return (BrowserTab)this.tabbedPane.getSelectedComponent();
 	}
 }
