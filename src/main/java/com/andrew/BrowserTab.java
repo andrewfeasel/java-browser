@@ -13,6 +13,7 @@ import java.awt.FlowLayout;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.ImageIcon;
 
 import java.awt.Dimension;
 import javax.swing.event.HyperlinkEvent;
@@ -23,8 +24,12 @@ import javax.swing.text.html.HTML;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
+import java.io.InputStream;
+import java.io.BufferedInputStream;
+
 import java.net.URL;
 import java.net.URI;
+import java.net.URLConnection;
 
 import javax.swing.text.BadLocationException;
 import java.io.IOException;
@@ -113,9 +118,26 @@ public class BrowserTab extends JComponent {
 		this.document = (HTMLDocument)this.textPane.getDocument();
 		
 		this.textPane.addPropertyChangeListener("page", event -> {
-			this.document = (HTMLDocument)this.textPane.getDocument();
-			String pageTitle = (String)this.document.getProperty(HTMLDocument.TitleProperty);
-			this.firePropertyChange("title", null, pageTitle);
+			String mimeType = null;
+			URL currentPage = (URL)event.getNewValue();
+			
+			try {
+				mimeType = currentPage.openConnection().getContentType();
+			} catch (IOException err) {
+				String errorText = String.format("<html><strong>Connection Error</strong><br/><p>%s</p></html>", err.toString());
+				this.textPane.setText(errorText);
+			}
+
+			if (mimeType.startsWith("image")) {
+				ImageIcon image = new ImageIcon(currentPage);
+				this.textPane.setText("");
+				this.textPane.insertIcon(image);
+				this.firePropertyChange("title", null, currentPage.toString());
+			} else {
+				this.document = (HTMLDocument)this.textPane.getDocument();
+				String pageTitle = (String)this.document.getProperty(HTMLDocument.TitleProperty);
+				this.firePropertyChange("title", null, pageTitle);
+			}
 		});
 		
 		JScrollPane scrollPane = new JScrollPane(this.textPane);
